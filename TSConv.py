@@ -14,7 +14,7 @@ class TSConv(ShiftConv):
     def forward(self, x):
         return super().forward(x)
     
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     import torch
     
     ts_conv = TSConv(

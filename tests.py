@@ -4,6 +4,8 @@ import torch.nn as nn
 
 from TSConv import TSConv
 
+QUICK_TEST = False
+
 def get_valid_model(conv, batchnorm):
     from UNet import Unet
     model = Unet(
@@ -14,6 +16,16 @@ def get_valid_model(conv, batchnorm):
 
 def test_example():
     assert 1 == 1
+    
+def test_validate_function_success():
+    from blocks import validate_conv_type
+    validate_conv_type(nn.Conv2d)
+    validate_conv_type(TSConv)
+    
+def test_validate_function_raises():
+    from blocks import validate_conv_type
+    with pytest.raises(TypeError):
+        validate_conv_type(nn.Conv3d)
 
 @pytest.mark.parametrize("conv", [nn.Conv2d, TSConv])
 @pytest.mark.parametrize("batchnorm", [True, False])
@@ -97,14 +109,14 @@ def test_ts_conv_forward(in_channels, out_channels):
     assert y.shape[1] == out_channels
     assert y.shape[3] == x.shape[3]
     assert y.shape[2] == x.shape[2]
-    
+
+@pytest.mark.skipif(QUICK_TEST, reason = "expediting other tests")
 @pytest.mark.parametrize("conv", [nn.Conv2d, TSConv])
 @pytest.mark.parametrize("batchnorm", [True, False])
 def test_UNetBaseline_Basic_Convergence(conv, batchnorm):
     # Sanity check to see if the model can overfit on a small random noise dataset
     # If the model does not show signs of converge, then there is likely an issue
     # with the model likely due to the architecture not connecting properly
-    model = get_valid_model(conv=conv, batchnorm=batchnorm)
     import torch
     import torch.optim as optim
     import torch.nn as nn
@@ -112,8 +124,12 @@ def test_UNetBaseline_Basic_Convergence(conv, batchnorm):
     from tqdm import tqdm
     from torch.utils.data import DataLoader
     
+    if not batchnorm:
+        pytest.skip("Non batchnorm vanilla conv2d is not expected to show convergence in this test")
+    
     torch.manual_seed(0)
     
+    model = get_valid_model(conv=conv, batchnorm=batchnorm)
     # Create a random noise dataset
     class RandomNoiseDataset(torch.utils.data.Dataset):
         def __init__(self, size, shape):

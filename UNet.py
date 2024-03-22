@@ -69,7 +69,7 @@ class Unet(nn.Module):
         
         return x
     
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     # CONV_MODE = nn.Conv2d
     CONV_MODE = TSConv
     

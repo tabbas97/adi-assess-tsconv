@@ -5,7 +5,8 @@ from TSConv import TSConv
 import layer_confs as lcfg
 
 def validate_conv_type(conv):
-    if (not isinstance(conv, (type))) or (type(conv) in [nn.Conv2d, TSConv]):
+    print(conv)
+    if (not isinstance(conv, (type))) or (conv not in [nn.Conv2d, TSConv]):
         raise TypeError("Provided with a non-class type. Acceptable : nn.Conv2d and TSConv. Given : " + str(conv))
 
 class DownsampleBlock(nn.Module):
@@ -234,9 +235,9 @@ class DoubleUpsampleBlock(nn.Module):
             
     def forward(self, x, skipped_match_1, skipped_match_2):
         x = self.upsample1(x)
-        print("DOUBLE UPSAMPLE BLOCK : upsampled shape : ", x.shape)
-        print("DOUBLE UPSAMPLE BLOCK : skipped_match_1 shape : ", skipped_match_1.shape)
-        print("DOUBLE UPSAMPLE BLOCK : skipped_match_2 shape : ", skipped_match_2.shape)
+        # print("DOUBLE UPSAMPLE BLOCK : upsampled shape : ", x.shape)
+        # print("DOUBLE UPSAMPLE BLOCK : skipped_match_1 shape : ", skipped_match_1.shape)
+        # print("DOUBLE UPSAMPLE BLOCK : skipped_match_2 shape : ", skipped_match_2.shape)
         x = torch.cat([x, skipped_match_1], dim=1)
         x = self.l1_conv1(x)
         if self.use_batchnorm:
@@ -255,7 +256,7 @@ class DoubleUpsampleBlock(nn.Module):
             x = self.bn4(x)
         return x
  
-if __name__  == "__main__":
+if __name__  == "__main__": # pragma: no cover
     import torch
     
     DUMP_ONNX = False

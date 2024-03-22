@@ -134,7 +134,7 @@ class ShiftConv(nn.Module):
         return x
     
     
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     torch.manual_seed(5)
     
     shift_conv = ShiftConv(
