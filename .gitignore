@@ -1,2 +1,4 @@
 *.onnx
 venv/
+__pycache__/
+.coverage

@@ -12,7 +12,9 @@ class Unet(nn.Module):
     convOptions = {
         "Conv2d": nn.Conv2d,
         "vanilla": nn.Conv2d, # Alias for Conv2d
-        "TSConv": TSConv
+        "baseline": nn.Conv2d, # Alias for Conv2d
+        "TSConv": TSConv,
+        "tsconv": TSConv
     }
     
     def __init__(self, conv : nn.Module = nn.Conv2d, use_batchnorm = False) -> None:
