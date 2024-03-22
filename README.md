@@ -51,6 +51,8 @@ unet_tsconv = UNet(
     )
 ```
 
+For training the mode, the standard Pytorch training model can be used since the model is an `nn.Module` object.
+
 ## Running the tests
 
 To run the tests, you can use the following command:
