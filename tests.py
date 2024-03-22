@@ -119,7 +119,7 @@ def test_shift_conv_forward(in_channels, out_channels, shift_axis, shift_len):
 @pytest.mark.parametrize("in_channels", [4, 8, 16, 32])
 @pytest.mark.parametrize("out_channels", [4, 8, 16, 32])
 def test_ts_conv_construct(in_channels, out_channels):
-    from ts_conv import TSConv
+    from TSConv import TSConv
     ts_conv = TSConv(
         in_channels = in_channels,
         out_channels = out_channels,
@@ -130,7 +130,7 @@ def test_ts_conv_construct(in_channels, out_channels):
 @pytest.mark.parametrize("in_channels", [4, 8, 16, 32])
 @pytest.mark.parametrize("out_channels", [4, 8, 16, 32])
 def test_ts_conv_forward(in_channels, out_channels):
-    from ts_conv import TSConv
+    from TSConv import TSConv
     ts_conv = TSConv(
         in_channels = in_channels,
         out_channels = out_channels,
