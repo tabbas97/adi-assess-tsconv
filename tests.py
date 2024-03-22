@@ -81,3 +81,63 @@ def test_UNetBaseline_Basic_Convergence():
     print("Losses : ", list_of_losses)
     # Check if the loss is decreasing
     assert np.mean(list_of_losses[:5]) > np.mean(list_of_losses[-5:])
+    
+@pytest.mark.parametrize("in_channels", [4, 8, 16, 32])
+@pytest.mark.parametrize("out_channels", [4, 8, 16, 32])
+@pytest.mark.parametrize("shift_axis", ["H", "W"])
+@pytest.mark.parametrize("shift_len", [1, 2, 3, 4])
+def test_shift_conv_construct(in_channels, out_channels, shift_axis, shift_len):
+    from shift_conv import ShiftConv
+    shift_conv = ShiftConv(
+        in_channels = in_channels,
+        out_channels = out_channels,
+        kernel_size = (3, 1),
+        shift_axis = shift_axis,
+        shift_len = shift_len
+        )
+    assert shift_conv is not None
+    
+@pytest.mark.parametrize("in_channels", [4, 8, 16, 32])
+@pytest.mark.parametrize("out_channels", [4, 8, 16, 32])
+@pytest.mark.parametrize("shift_axis", ["H", "W"])
+@pytest.mark.parametrize("shift_len", [1, 2, 3, 4])
+def test_shift_conv_forward(in_channels, out_channels, shift_axis, shift_len):
+    from shift_conv import ShiftConv
+    shift_conv = ShiftConv(
+        in_channels = in_channels,
+        out_channels = out_channels,
+        kernel_size = (3, 1),
+        shift_axis = shift_axis,
+        shift_len = shift_len
+        )
+    x = torch.rand(1, in_channels, 256, 256)
+    y = shift_conv(x)
+    assert y.shape[1] == out_channels
+    assert y.shape[3] == x.shape[3]
+    assert y.shape[2] == x.shape[2]
+    
+@pytest.mark.parametrize("in_channels", [4, 8, 16, 32])
+@pytest.mark.parametrize("out_channels", [4, 8, 16, 32])
+def test_ts_conv_construct(in_channels, out_channels):
+    from ts_conv import TSConv
+    ts_conv = TSConv(
+        in_channels = in_channels,
+        out_channels = out_channels,
+        kernel_size = (3, 1)
+        )
+    assert ts_conv is not None
+    
+@pytest.mark.parametrize("in_channels", [4, 8, 16, 32])
+@pytest.mark.parametrize("out_channels", [4, 8, 16, 32])
+def test_ts_conv_forward(in_channels, out_channels):
+    from ts_conv import TSConv
+    ts_conv = TSConv(
+        in_channels = in_channels,
+        out_channels = out_channels,
+        kernel_size = (3, 1)
+        )
+    x = torch.rand(1, in_channels, 256, 256)
+    y = ts_conv(x)
+    assert y.shape[1] == out_channels
+    assert y.shape[3] == x.shape[3]
+    assert y.shape[2] == x.shape[2]
