@@ -231,6 +231,28 @@ if __name__  == "__main__":
         torch.onnx.export(downsample_block, ds1_input, "downsample_block.onnx")
         
     print("=================================================")
+    
+    # Test DoubleDownSampleBlock
+    double_downsample_block = DoubleDownSampleBlock(4, 8)
+    dds1_output, dds1_skip1, dds1_skip2 = double_downsample_block(ds1_output)
+    print("DoubleDownSampleBlock input shape : ", ds1_output.shape)
+    print("DoubleDownSampleBlock output shape : ", dds1_output.shape)
+    print("DoubleDownSampleBlock skip1 shape : ", dds1_skip1.shape)
+    print("DoubleDownSampleBlock skip2 shape : ", dds1_skip2.shape)
+    if DUMP_ONNX:
+        torch.onnx.export(double_downsample_block, ds1_output, "double_downsample_block.onnx")
+        
+    print("=================================================")
+    
+    # Test DoubleUpsampleBlock
+    double_upsample_block = DoubleUpsampleBlock(8, 4)
+    dus1_output = double_upsample_block(dds1_output, dds1_skip2, dds1_skip1)
+    print("DoubleUpsampleBlock input shapes : ", dds1_output.shape, dds1_skip1.shape, dds1_skip2.shape)
+    print("DoubleUpsampleBlock output shape : ", dus1_output.shape)
+    if DUMP_ONNX:
+        torch.onnx.export(double_upsample_block, (dds1_output, dds1_skip2, dds1_skip1), "double_upsample_block.onnx")
+        
+    print("=================================================")
         
     # Test UpsampleBlock
     upsample_block = UpsampleBlock(4, 4)
