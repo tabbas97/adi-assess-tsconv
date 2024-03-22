@@ -2,8 +2,8 @@ import pytest
 import torch
 
 def get_valid_model_baseline():
-    from baseline_unet import UnetBaseline
-    model = UnetBaseline()
+    from UNet import Unet
+    model = Unet()
     return model
 
 def test_example():

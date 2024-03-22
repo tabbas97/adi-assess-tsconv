@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 from typing import Union, Optional
+import warnings
 
 class ShiftConv(nn.Module):
     """
@@ -23,8 +24,7 @@ class ShiftConv(nn.Module):
     def __init__(self, 
                  in_channels : int, 
                  out_channels : int, 
-                 kernel_size : Union[int, tuple], 
-                 use_batchnorm : bool = False, 
+                 kernel_size : Union[int, tuple],
                  shift_len : int = 1, 
                  shift_axis : str = "W", *args, **kwargs):
         """Initializes the ShiftConv layer
@@ -60,6 +60,12 @@ class ShiftConv(nn.Module):
             
         if isinstance(kernel_size, int):
             kernel_size = (kernel_size, 1)
+            
+        stride = kwargs.pop("stride", 1)
+        padding = kwargs.pop("padding", "same")
+            
+        if len(kwargs) > 0:
+            warnings.warn("Following parameters are ignored : " + str(kwargs))
         
         self.shift_len = shift_len
         
@@ -69,12 +75,10 @@ class ShiftConv(nn.Module):
         # print("in_channels", in_channels)
         self.conv = nn.Conv2d(
             in_channels, out_channels, 
-            kernel_size = kernel_size, 
-            *args, **kwargs
+            kernel_size = kernel_size,
+            stride=stride,
+            padding=padding
             )
-        
-        if use_batchnorm:
-            self.bn = nn.BatchNorm2d(out_channels)
         
     def forward(self, x):
         # Split the input tensor into three parts along the channel axis 
@@ -126,8 +130,7 @@ class ShiftConv(nn.Module):
         x = torch.cat([static, dynamic_shift_neg, dynamic_shift_pos], dim=1)
         
         x = self.conv(x)
-        if hasattr(self, 'bn'):
-            x = self.bn(x)
+        
         return x
     
     
