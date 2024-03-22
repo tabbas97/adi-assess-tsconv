@@ -22,13 +22,13 @@ class Unet(nn.Module):
             nn.BatchNorm2d(4) if use_batchnorm else nn.Sequential()
             )
         
-        self.dsb1 : DownsampleBlock = DownsampleBlock(4, 4, conv = CONV_MODE, use_batchnorm=use_batchnorm)
-        self.ddsb1 : DoubleDownSampleBlock = DoubleDownSampleBlock(4, 8, conv = CONV_MODE, use_batchnorm=use_batchnorm)
-        self.ddsb2 : DoubleDownSampleBlock = DoubleDownSampleBlock(8, 16, conv = CONV_MODE, use_batchnorm=use_batchnorm)
+        self.dsb1 : DownsampleBlock = DownsampleBlock(4, 4, conv = conv, use_batchnorm=use_batchnorm)
+        self.ddsb1 : DoubleDownSampleBlock = DoubleDownSampleBlock(4, 8, conv = conv, use_batchnorm=use_batchnorm)
+        self.ddsb2 : DoubleDownSampleBlock = DoubleDownSampleBlock(8, 16, conv = conv, use_batchnorm=use_batchnorm)
         
-        self.dupsb1 : DoubleUpsampleBlock = DoubleUpsampleBlock(16, 8, conv = CONV_MODE, use_batchnorm=use_batchnorm)
-        self.dupsb2 : DoubleUpsampleBlock = DoubleUpsampleBlock(8, 4, conv = CONV_MODE, use_batchnorm=use_batchnorm)
-        self.upsb3 : UpsampleBlock = UpsampleBlock(4, 4, conv = CONV_MODE, use_batchnorm=use_batchnorm)
+        self.dupsb1 : DoubleUpsampleBlock = DoubleUpsampleBlock(16, 8, conv = conv, use_batchnorm=use_batchnorm)
+        self.dupsb2 : DoubleUpsampleBlock = DoubleUpsampleBlock(8, 4, conv = conv, use_batchnorm=use_batchnorm)
+        self.upsb3 : UpsampleBlock = UpsampleBlock(4, 4, conv = conv, use_batchnorm=use_batchnorm)
         
         self.output_conv = nn.Sequential(
             conv(4, 1, kernel_size=lcfg.CONV_KERNEL_SIZE, padding='same'),
