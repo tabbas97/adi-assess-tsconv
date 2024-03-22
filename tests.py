@@ -124,7 +124,7 @@ def test_UNetBaseline_Basic_Convergence(conv, batchnorm):
     from tqdm import tqdm
     from torch.utils.data import DataLoader
     
-    if not batchnorm:
+    if conv == nn.Conv2d and not batchnorm:
         pytest.skip("Non batchnorm vanilla conv2d is not expected to show convergence in this test")
     
     torch.manual_seed(0)

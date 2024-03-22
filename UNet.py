@@ -8,6 +8,13 @@ import layer_confs as lcfg
 from blocks import DownsampleBlock, UpsampleBlock, DoubleUpsampleBlock, DoubleDownSampleBlock, validate_conv_type
 
 class Unet(nn.Module):
+    
+    convOptions = {
+        "Conv2d": nn.Conv2d,
+        "vanilla": nn.Conv2d, # Alias for Conv2d
+        "TSConv": TSConv
+    }
+    
     def __init__(self, conv : nn.Module = nn.Conv2d, use_batchnorm = False) -> None:
         super().__init__()
         
