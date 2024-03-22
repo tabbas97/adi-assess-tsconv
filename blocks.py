@@ -5,6 +5,13 @@ import layer_confs as lcfg
 
 class DownsampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels, use_batchnorm=False):
+        """Downsample block
+
+        Args:
+            in_channels (int): Number of input channels
+            out_channels (int): Number of output channels
+            use_batchnorm (bool, optional): Toggle batchnorm. Defaults to False.
+        """
         super(DownsampleBlock, self).__init__()
         # Design - Maxpooling -> Conv2d & ReLU -> Conv2d & ReLU
         
@@ -35,7 +42,6 @@ class DownsampleBlock(nn.Module):
         if use_batchnorm:
             self.conv2_bn = nn.BatchNorm2d(out_channels)
         
-    
     def forward(self, x):
         x = self.maxpool(x)
         x = self.conv1(x)
@@ -50,6 +56,13 @@ class DownsampleBlock(nn.Module):
 
 class DoubleDownSampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels, use_batchnorm = False):
+        """Double downsample block
+
+        Args:
+            in_channels (int): Number of input channels
+            out_channels (int): Number of output channels
+            use_batchnorm (bool, optional): Toggle batchnorm. Defaults to False.
+        """
         super().__init__()
         self.maxpool = nn.MaxPool2d(kernel_size=lcfg.POOLING_KERNEL_SIZE)
         self.l1_conv1 = nn.Conv2d(
@@ -106,6 +119,13 @@ class DoubleDownSampleBlock(nn.Module):
 
 class UpsampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels, use_batchnorm = False) -> None:
+        """Upsample block
+
+        Args:
+            in_channels (int): Number of input channels
+            out_channels (int): Number of output channels
+            use_batchnorm (bool, optional): Toggle batchnorm. Defaults to False.
+        """
         super().__init__()
         
         self.upsample = nn.ConvTranspose2d(
@@ -143,6 +163,13 @@ class UpsampleBlock(nn.Module):
     
 class DoubleUpsampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels, use_batchnorm = False) -> None:
+        """Double upsample block
+
+        Args:
+            in_channels (int): Number of input channels
+            out_channels (int): Number of output channels
+            use_batchnorm (bool, optional): Toggle batchnorm. Defaults to False.
+        """
         super().__init__()
         
         self.upsample1 = nn.ConvTranspose2d(
