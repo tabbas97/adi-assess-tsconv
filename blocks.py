@@ -48,6 +48,62 @@ class DownsampleBlock(nn.Module):
             x = self.conv2_bn(x)
         return x
 
+class DoubleDownSampleBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, use_batchnorm = False):
+        super().__init__()
+        self.maxpool = nn.MaxPool2d(kernel_size=lcfg.POOLING_KERNEL_SIZE)
+        self.l1_conv1 = nn.Conv2d(
+            in_channels, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        self.l1_conv2 = nn.Conv2d(
+            out_channels, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        self.use_batchnorm = use_batchnorm
+        if use_batchnorm:
+            self.bn1 = nn.BatchNorm2d(out_channels)
+            self.bn2 = nn.BatchNorm2d(out_channels)
+            
+        self.l2_conv1 = nn.Conv2d(
+            out_channels, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        self.l2_conv2 = nn.Conv2d(
+            out_channels, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        if use_batchnorm:
+            self.bn3 = nn.BatchNorm2d(out_channels)
+            self.bn4 = nn.BatchNorm2d(out_channels)
+            
+    def forward(self, x):
+        skip1 = x
+        x = self.maxpool(x)
+        x = self.l1_conv1(x)
+        if self.use_batchnorm:
+            x = self.bn1(x)
+        x = self.l1_conv2(x)
+        if self.use_batchnorm:
+            x = self.bn2(x)
+        skip2 = x
+        x = self.maxpool(x)
+        x = self.l2_conv1(x)
+        if self.use_batchnorm:
+            x = self.bn3(x)
+        x = self.l2_conv2(x)
+        if self.use_batchnorm:
+            x = self.bn4(x)
+        return x, skip1, skip2
+
 class UpsampleBlock(nn.Module):
     def __init__(self, in_channels, out_channels, use_batchnorm = False) -> None:
         super().__init__()
@@ -85,6 +141,77 @@ class UpsampleBlock(nn.Module):
             x = self.bn2(x)
         return x
     
+class DoubleUpsampleBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, use_batchnorm = False) -> None:
+        super().__init__()
+        
+        self.upsample1 = nn.ConvTranspose2d(
+            in_channels, in_channels//2,
+            kernel_size = lcfg.UPSAMPLE_KERNEL_SIZE,
+            stride = lcfg.UPSAMPLE_KERNEL_SIZE
+            )
+        self.l1_conv1 = nn.Conv2d(
+            in_channels + in_channels//2, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        self.l1_conv2 = nn.Conv2d(
+            out_channels, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        self.use_batchnorm = use_batchnorm
+        if use_batchnorm:
+            self.bn1 = nn.BatchNorm2d(out_channels)
+            self.bn2 = nn.BatchNorm2d(out_channels)
+            
+        self.upsample2 = nn.ConvTranspose2d(
+            out_channels, out_channels//2,
+            kernel_size = lcfg.UPSAMPLE_KERNEL_SIZE,
+            stride = lcfg.UPSAMPLE_KERNEL_SIZE
+            )
+            
+        self.l2_conv1 = nn.Conv2d(
+            out_channels + out_channels//2, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        self.l2_conv2 = nn.Conv2d(
+            out_channels, out_channels,
+            kernel_size = lcfg.CONV_KERNEL_SIZE,
+            stride = lcfg.CONV_STRIDE,
+            padding = 'same'
+            )
+        if use_batchnorm:
+            self.bn3 = nn.BatchNorm2d(out_channels)
+            self.bn4 = nn.BatchNorm2d(out_channels)
+            
+    def forward(self, x, skipped_match_1, skipped_match_2):
+        x = self.upsample1(x)
+        print("DOUBLE UPSAMPLE BLOCK : upsampled shape : ", x.shape)
+        print("DOUBLE UPSAMPLE BLOCK : skipped_match_1 shape : ", skipped_match_1.shape)
+        print("DOUBLE UPSAMPLE BLOCK : skipped_match_2 shape : ", skipped_match_2.shape)
+        x = torch.cat([x, skipped_match_1], dim=1)
+        x = self.l1_conv1(x)
+        if self.use_batchnorm:
+            x = self.bn1(x)
+        x = self.l1_conv2(x)
+        if self.use_batchnorm:
+            x = self.bn2(x)
+            
+        x = self.upsample2(x)
+        x = torch.cat([x, skipped_match_2], dim=1)
+        x = self.l2_conv1(x)
+        if self.use_batchnorm:
+            x = self.bn3(x)
+        x = self.l2_conv2(x)
+        if self.use_batchnorm:
+            x = self.bn4(x)
+        return x
+ 
 if __name__  == "__main__":
     import torch
     
@@ -114,4 +241,3 @@ if __name__  == "__main__":
         torch.onnx.export(upsample_block, (ds1_output, ds1_input), "upsample_block.onnx")
         
     print("=================================================")
-        
