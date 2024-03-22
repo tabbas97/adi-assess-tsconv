@@ -26,7 +26,7 @@ class ShiftConv(nn.Module):
                  kernel_size : Union[int, tuple], 
                  use_batchnorm : bool = False, 
                  shift_len : int = 1, 
-                 shift_axis : str = "W"):
+                 shift_axis : str = "W", *args, **kwargs):
         """Initializes the ShiftConv layer
 
         Args:
@@ -70,8 +70,7 @@ class ShiftConv(nn.Module):
         self.conv = nn.Conv2d(
             in_channels, out_channels, 
             kernel_size = kernel_size, 
-            # stride = kernel_size,
-            padding = 'same',
+            *args, **kwargs
             )
         
         if use_batchnorm:
